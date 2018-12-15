@@ -10,13 +10,11 @@ import org.usfirst.frc.team4488.robot.loops.Looper;
 import org.usfirst.frc.team4488.robot.loops.RobotStateEstimator;
 import org.usfirst.frc.team4488.robot.operator.Controllers;
 import org.usfirst.frc.team4488.robot.operator.Logging;
-import org.usfirst.frc.team4488.robot.sensors.ArduinoAnalog;
-import org.usfirst.frc.team4488.robot.systems.Climber;
+import org.usfirst.frc.team4488.robot.systems.Camera;
 import org.usfirst.frc.team4488.robot.systems.Drive;
-import org.usfirst.frc.team4488.robot.systems.Forklift;
-import org.usfirst.frc.team4488.robot.systems.Intake;
-import org.usfirst.frc.team4488.robot.systems.Manipulator;
+import org.usfirst.frc.team4488.robot.systems.Shooter;
 import org.usfirst.frc.team4488.robot.systems.SubsystemManager;
+import org.usfirst.frc.team4488.robot.systems.Turret;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -25,7 +23,9 @@ import org.usfirst.frc.team4488.robot.systems.SubsystemManager;
  * resource directory.
  */
 public class Robot extends IterativeRobot {
+
   private Drive drive;
+  private Shooter shooter;
   private Looper looper;
   private Looper constantLooper;
 
@@ -34,14 +34,12 @@ public class Robot extends IterativeRobot {
   private Logging logger = Logging.getInstance();
   public static Timer timer;
   private SubsystemManager subsystemManager;
-  private boolean driveExists;
   public static boolean isAuto = false;
+
   /** Run once as soon as code is loaded onto the RoboRio */
   @Override
   public void robotInit() {
     logger.writeRaw("Robot Started!");
-    logger.addTrackable(() -> Forklift.getInstance().getCurrentHeight(), "ForkliftHeight", 5);
-    logger.addTrackable(() -> Manipulator.getInstance().getPosition(), "ManipPosition", 10);
 
     looper = new Looper();
     constantLooper = new Looper();
@@ -52,12 +50,16 @@ public class Robot extends IterativeRobot {
       drive = Drive.getInstance();
     }
 
+    // TODO create shooter class
+    shooter = new Shooter();
+
     AutoModeSelector.init();
 
     looper.register(RobotStateEstimator.getInstance());
     subsystemManager.registerEnabledLoops(looper);
 
-    constantLooper.register(ArduinoAnalog.getInstance());
+    // Register anything for the constant looper here
+    constantLooper.register(Camera.getInstance());
     constantLooper.start();
   }
 
@@ -67,44 +69,48 @@ public class Robot extends IterativeRobot {
     subsystemManager.updateSmartDashboard();
     robotState.updateSmartDashboard();
     logger.update();
+    SmartDashboard.putNumber("Camera X", Camera.getInstance().getX());
+    SmartDashboard.putNumber("Camera Y", Camera.getInstance().getY());
   }
 
   /** Run once at the beginning of autonomous mode */
   @Override
   public void autonomousInit() {
     isAuto = true;
-    logger.writeToLogFormatted(this, "autonomousInit()");
+    logger.writeRaw("Autonomous Init");
     looper.start();
+    /*
     if (mAutoModeExecuter != null) {
       mAutoModeExecuter.stop();
     }
+    */
 
     if (RobotMap.driveExists) {
       drive.resetAngle();
     }
-    mAutoModeExecuter = null;
-    Forklift.getInstance().setDoneRange(Constants.liftAutoDoneRange);
+
+    // mAutoModeExecuter = null;
     subsystemManager.zeroSensors();
     wait(250); // Encoder values and other sensor data is not valid until 250ms after they are reset
 
+    /*
     mAutoModeExecuter = new AutoModeExecuter();
     mAutoModeExecuter.setAutoMode(AutoModeSelector.getSelectedAutoMode());
     mAutoModeExecuter.start();
+    */
   }
 
   @Override
   public void teleopInit() {
     isAuto = false;
-    logger.writeToLogFormatted(this, "teleopInit()");
+    logger.writeRaw("Teleop Init");
+
     if (RobotMap.driveExists == true) {
       drive.configPercentVbus();
       drive.UnBreakModeAll();
     }
 
     looper.start();
-    AutoModeSelector.updateFMS();
-    Forklift.getInstance().setDoneRange(Constants.liftTeleDoneRange);
-    Climber.getInstance().reset();
   }
 
   /** This function is called periodically during autonomous */
@@ -116,31 +122,34 @@ public class Robot extends IterativeRobot {
   public void teleopPeriodic() {
     Controllers xbox = Controllers.getInstance();
 
-    SmartDashboard.putBoolean("Intake is in", Intake.getInstance().isIn());
-
     if (xbox.getStart(xbox.m_secondary)) {
       subsystemManager.reset();
     }
 
     subsystemManager.controllerUpdates();
+    Turret.getInstance().setError((int) Camera.getInstance().getX());
+    Shooter.getInstance().on();
+    SmartDashboard.putBoolean("Turret On Target", Turret.getInstance().onTarget());
   }
 
   @Override
   public void testInit() {
-    logger.writeToLogFormatted(this, "testInit()");
+    logger.writeRaw("Test Init");
   }
 
   /** This function is called periodically during test mode */
   @Override
   public void testPeriodic() {}
+
   /** This function is called once as soon as the robot is disabled */
   @Override
   public void disabledInit() {
-    logger.writeToLogFormatted(this, "Robot Disabled!");
+    logger.writeRaw("Robot Disabled!");
 
     if (mAutoModeExecuter != null) {
       mAutoModeExecuter.stop();
     }
+
     mAutoModeExecuter = null;
 
     subsystemManager.updatePrefs();

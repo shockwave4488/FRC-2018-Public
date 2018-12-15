@@ -65,47 +65,8 @@ public class Constants {
   public static double kMaxGoalTrackAge = 1.0;
   public static double kMaxTrackerDistance = 18.0;
   public static double kTimeoutMs = 0.0;
+
   // Our constants
   public static double kLooperDt = 0.005;
   public static final String prefsPath = "/home/admin/Preferences.json";
-  public static final double forkliftDeadband = 0.2;
-
-  /*
-   *  lift constants
-   *
-   */
-
-  public static double liftIdleHeight = 20;
-  public static double liftSafetyCheckHeight = 15.5;
-  public static double liftHeightMaxInches = 85; // divide by 2 for safety
-  public static double liftHeightMinInches = 1; // added 10 for safety
-  public static double minHeightWithIntakeOut = 15.5;
-  public static double overrideManipHeight = 35;
-  public static double pulleyDiameterInches = 1.28;
-
-  public static double climberSoftCurrentLimit = 0; // this is wrong
-  public static double climberHardCurrentLimit = 0; // this is wrong
-  public static double climbBarHeight = 35.75;
-  public static double climbHeightInches = 205;
-
-  public static double powercoreForkliftMax = 5000; // @TODO fix me.
-  public static double powercoreForkliftMin = 0;
-  public static double powercoreClimberMax = 5000; // @TODO fix me.
-  public static double powercoreClimberMin = 0;
-
-  public static double practiceBotLiftTicksToInches = 0.01758;
-
-  public static double manipulatorMin = -8;
-  public static double manipulatorMax = 8;
-  public static double manipulatorSafetyMargin = 0.5;
-  public static double manipulatorSafeMin = (manipulatorMin + manipulatorSafetyMargin);
-  public static double manipulatorSafeMax = (manipulatorMax - manipulatorSafetyMargin);
-  public static double manipulatorZeroOffset = -9.6;
-  public static double minSafeLiftHeight = 30;
-
-  public static double scoreHeight = 77;
-
-  public static double flickHeight = 46;
-  public static double liftTeleDoneRange = 2;
-  public static double liftAutoDoneRange = 1.5;
 }

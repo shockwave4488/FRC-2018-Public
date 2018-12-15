@@ -140,7 +140,7 @@ public class Drive extends Subsystem implements TankDrive {
     logger.writeToLogFormatted(this, "constructor started");
     m_navx = NavX.getInstance();
 
-    if (RobotMap.robotName == RobotName.PracticeBot) {
+    if (RobotMap.robotName == RobotName.Mock) {
       wheelDiameter = Constants.practiceWheelDiameter;
       ticksPerRotation = Constants.practiceEncoderTicks;
     } else if (RobotMap.robotName == RobotName.ProgrammingPlatform) {
@@ -181,7 +181,7 @@ public class Drive extends Subsystem implements TankDrive {
       rightSlave2.configOpenloopRamp(RAMPRATE, 0);
 
       // inverts for test platform and practice bot are switched
-      if (RobotMap.robotName == RobotMap.robotName.PracticeBot) {
+      if (RobotMap.robotName == RobotMap.robotName.Mock) {
         m_left.setInverted(true);
         leftSlave1.setInverted(true);
         leftSlave2.setInverted(true);
@@ -213,8 +213,8 @@ public class Drive extends Subsystem implements TankDrive {
       m_right.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 
       reloadGains(); // update PID constants in talons
-      if (RobotMap.robotName == RobotName.PracticeBot) {
-        shifter = new Solenoid(RobotMap.DriveGearShiftSolenoid);
+      if (RobotMap.robotName == RobotName.Mock) {
+        // shifter = new Solenoid(RobotMap.DriveGearShiftSolenoid);
       }
 
       newGear = DriveGear.LowGear;
@@ -336,12 +336,12 @@ public class Drive extends Subsystem implements TankDrive {
   }
 
   private void gearShiftUpdate() {
-    if (RobotMap.robotName == RobotName.PracticeBot) {
+    if (RobotMap.robotName == RobotName.Mock) {
       if (newGear == DriveGear.HighGear) {
-        shifter.set(true);
+        // shifter.set(true);
         currentGear = DriveGear.HighGear;
       } else {
-        shifter.set(false);
+        // shifter.set(false);
         currentGear = DriveGear.LowGear;
       }
     }
@@ -618,7 +618,7 @@ public class Drive extends Subsystem implements TankDrive {
    */
   public synchronized void reloadGains() {
     logger.writeToLogFormatted(this, "start of reloadGains");
-    if (RobotMap.robotName == RobotMap.robotName.PracticeBot) {
+    if (RobotMap.robotName == RobotMap.robotName.Mock) {
       m_left.config_kP(0, Constants.kDriveHighGearVelocityKp, 0);
       m_left.config_kI(0, Constants.kDriveHighGearVelocityKi, 0);
       m_left.config_kD(0, Constants.kDriveHighGearVelocityKd, 0);
